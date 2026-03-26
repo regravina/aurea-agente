@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AUREA — Agente Estratégico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ouro: #C9A84C;
+    --ouro-claro: #E8D5A3;
+    --ouro-escuro: #8B6914;
+    --fundo: #0D0D0B;
+    --fundo2: #141410;
+    --fundo3: #1C1C16;
+    --texto: #F0EAD6;
+    --texto2: #A89F8C;
+    --texto3: #6B6456;
+    --borda: rgba(201,168,76,0.2);
+    --borda2: rgba(201,168,76,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--fundo);
+    color: var(--texto);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TELA DE LOGIN */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 2rem;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 50% 0%, rgba(201,168,76,0.08) 0%, transparent 60%);
+  }
+
+  .login-logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 3rem;
+    font-weight: 600;
+    letter-spacing: 0.3em;
+    color: var(--ouro);
+    text-align: center;
+  }
+
+  .login-sub {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--texto3);
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: -1.5rem;
+  }
+
+  .login-box {
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .login-box input {
+    width: 100%;
+    background: var(--fundo3);
+    border: 1px solid var(--borda);
+    border-radius: 4px;
+    padding: 14px 16px;
+    color: var(--texto);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-box input:focus { border-color: var(--ouro); }
+  .login-box input::placeholder { color: var(--texto3); }
+
+  .btn-entrar {
+    width: 100%;
+    background: var(--ouro);
+    border: none;
+    border-radius: 4px;
+    padding: 14px;
+    color: var(--fundo);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-entrar:hover { background: var(--ouro-claro); }
+
+  .login-erro {
+    color: #E24B4A;
+    font-size: 11px;
+    text-align: center;
+    letter-spacing: 0.05em;
+    display: none;
+  }
+
+  /* APP PRINCIPAL */
+  #app {
+    display: none;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--borda2);
+    background: var(--fundo2);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  .header-marca {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    color: var(--ouro);
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--texto3);
+    letter-spacing: 0.05em;
+  }
+
+  .dot-online {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #639922;
+  }
+
+  /* LAYOUT PRINCIPAL */
+  .main-layout {
+    display: flex;
+    flex: 1;
+    height: calc(100vh - 57px);
+  }
+
+  /* SIDEBAR */
+  aside {
+    width: 220px;
+    flex-shrink: 0;
+    border-right: 1px solid var(--borda2);
+    background: var(--fundo2);
+    display: flex;
+    flex-direction: column;
+    padding: 1rem 0;
+    overflow-y: auto;
+  }
+
+  .sidebar-section {
+    padding: 0 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebar-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--texto3);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 10px;
+    color: var(--texto2);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 2px;
+  }
+
+  .sidebar-btn:hover { background: var(--fundo3); color: var(--texto); }
+  .sidebar-btn.ativo { background: var(--fundo3); color: var(--ouro); border-left: 2px solid var(--ouro); }
+
+  .sidebar-divider {
+    height: 1px;
+    background: var(--borda2);
+    margin: 0.5rem 1rem 1rem;
+  }
+
+  /* ÁREA DO CHAT */
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .chat-contexto {
+    padding: 12px 1.5rem;
+    background: var(--fundo3);
+    border-bottom: 1px solid var(--borda2);
+    font-size: 11px;
+    color: var(--texto3);
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .contexto-tag {
+    background: rgba(201,168,76,0.1);
+    color: var(--ouro);
+    border: 1px solid var(--borda);
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .mensagens {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--borda2) transparent;
+  }
+
+  .msg {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-width: 85%;
+    animation: fadeUp 0.3s ease;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-user { align-self: flex-end; }
+  .msg-agent { align-self: flex-start; }
+
+  .msg-autor {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--texto3);
+    padding: 0 4px;
+  }
+
+  .msg-user .msg-autor { text-align: right; color: var(--ouro-escuro); }
+
+  .msg-bubble {
+    padding: 12px 16px;
+    border-radius: 6px;
+    line-height: 1.7;
+    font-size: 13px;
+  }
+
+  .msg-user .msg-bubble {
+    background: rgba(201,168,76,0.12);
+    border: 1px solid var(--borda);
+    color: var(--texto);
+    border-radius: 6px 6px 2px 6px;
+  }
+
+  .msg-agent .msg-bubble {
+    background: var(--fundo3);
+    border: 1px solid var(--borda2);
+    color: var(--texto);
+    border-radius: 6px 6px 6px 2px;
+  }
+
+  .msg-bubble p { margin-bottom: 8px; }
+  .msg-bubble p:last-child { margin-bottom: 0; }
+  .msg-bubble strong { color: var(--ouro-claro); font-weight: 500; }
+  .msg-bubble ul, .msg-bubble ol { padding-left: 1.2rem; margin: 6px 0; }
+  .msg-bubble li { margin-bottom: 4px; }
+
+  /* DIGITANDO */
+  .typing-indicator {
+    display: none;
+    align-self: flex-start;
+    padding: 12px 16px;
+    background: var(--fundo3);
+    border: 1px solid var(--borda2);
+    border-radius: 6px 6px 6px 2px;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .typing-indicator.visivel { display: flex; }
+
+  .typing-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--ouro);
+    animation: pulse 1.2s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  /* INPUT */
+  .input-area {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--borda2);
+    background: var(--fundo2);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .input-wrapper {
+    flex: 1;
+    position: relative;
+  }
+
+  #input-msg {
+    width: 100%;
+    background: var(--fundo3);
+    border: 1px solid var(--borda);
+    border-radius: 6px;
+    padding: 12px 14px;
+    color: var(--texto);
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    resize: none;
+    outline: none;
+    line-height: 1.5;
+    max-height: 140px;
+    overflow-y: auto;
+    transition: border-color 0.2s;
+    scrollbar-width: thin;
+  }
+
+  #input-msg:focus { border-color: var(--ouro); }
+  #input-msg::placeholder { color: var(--texto3); }
+
+  .btn-enviar {
+    background: var(--ouro);
+    border: none;
+    border-radius: 6px;
+    width: 42px;
+    height: 42px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+
+  .btn-enviar:hover { background: var(--ouro-claro); }
+  .btn-enviar:disabled { background: var(--fundo3); cursor: not-allowed; }
+
+  .btn-enviar svg { width: 16px; height: 16px; fill: var(--fundo); }
+  .btn-enviar:disabled svg { fill: var(--texto3); }
+
+  /* ATALHOS RÁPIDOS */
+  .atalhos {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 0.5rem 1.5rem 0;
+  }
+
+  .atalho-btn {
+    background: var(--fundo3);
+    border: 1px solid var(--borda2);
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 11px;
+    color: var(--texto2);
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.03em;
+    transition: all 0.15s;
+  }
+
+  .atalho-btn:hover { border-color: var(--borda); color: var(--ouro); }
+
+  /* MOBILE */
+  @media (max-width: 600px) {
+    aside { display: none; }
+    .chat-contexto { display: none; }
+    .msg { max-width: 95%; }
+    .header-marca { font-size: 1.1rem; }
+  }
+
+  /* SCROLLBAR */
+  .mensagens::-webkit-scrollbar { width: 4px; }
+  .mensagens::-webkit-scrollbar-track { background: transparent; }
+  .mensagens::-webkit-scrollbar-thumb { background: var(--borda2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<div id="login-screen">
+  <div class="login-logo">AUREA</div>
+  <div class="login-sub">Agente Estratégico</div>
+  <div class="login-box">
+    <input type="password" id="senha-input" placeholder="senha de acesso" autocomplete="current-password">
+    <button class="btn-entrar" onclick="verificarSenha()">Entrar</button>
+    <div class="login-erro" id="login-erro">Senha incorreta.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <header>
+    <div class="header-marca">AUREA</div>
+    <div class="header-status">
+      <div class="dot-online"></div>
+      agente ativo
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <aside>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Modo</div>
+        <button class="sidebar-btn ativo" onclick="setModo(this, 'estrategia')">Estratégia geral</button>
+        <button class="sidebar-btn" onclick="setModo(this, 'meta')">Meta Ads</button>
+        <button class="sidebar-btn" onclick="setModo(this, 'seo')">SEO & site</button>
+        <button class="sidebar-btn" onclick="setModo(this, 'conteudo')">Conteúdo</button>
+        <button class="sidebar-btn" onclick="setModo(this, 'email')">E-mail marketing</button>
+        <button class="sidebar-btn" onclick="setModo(this, 'ebook')">E-books & cursos</button>
+      </div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Ações</div>
+        <button class="sidebar-btn" onclick="limparChat()">Nova conversa</button>
+      </div>
+    </aside>
+
+    <div class="chat-area">
+      <div class="chat-contexto">
+        <span>contexto:</span>
+        <span class="contexto-tag" id="tag-modo">Estratégia geral</span>
+        <span id="desc-modo">AUREA Comunicação & Marketing — Re Gravina</span>
+      </div>
+
+      <div class="mensagens" id="mensagens">
+        <div class="msg msg-agent">
+          <div class="msg-autor">agente aurea</div>
+          <div class="msg-bubble">
+            Olá, Re. Estou pronta para trabalhar.<br><br>
+            Você pode me perguntar sobre qualquer área — Meta Ads, SEO, conteúdo, e-mail, e-books ou estratégia geral. Use os atalhos abaixo ou escreva diretamente o que precisa.
+          </div>
+        </div>
+      </div>
+
+      <div class="typing-indicator" id="typing">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+
+      <div class="atalhos">
+        <button class="atalho-btn" onclick="enviarAtalho('O que devo priorizar essa semana na AUREA?')">Prioridades da semana</button>
+        <button class="atalho-btn" onclick="enviarAtalho('Analise meus anúncios Meta e sugira melhorias')">Analisar Meta Ads</button>
+        <button class="atalho-btn" onclick="enviarAtalho('Crie um post para Instagram sobre oratória')">Post Instagram</button>
+        <button class="atalho-btn" onclick="enviarAtalho('Como melhorar o SEO do aureacommkt.com.br?')">Melhorar SEO</button>
+        <button class="atalho-btn" onclick="enviarAtalho('Crie um e-mail para minha lista sobre o e-book de oratória')">E-mail para lista</button>
+      </div>
+
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea id="input-msg" rows="1" placeholder="pergunte ou peça algo..." onkeydown="teclaEnter(event)" oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="btn-enviar" id="btn-enviar" onclick="enviarMensagem()">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const SENHA = "aurea2026";
+
+const CONTEXTOS = {
+  estrategia: {
+    tag: "Estratégia geral",
+    desc: "AUREA Comunicação & Marketing — Re Gravina",
+    system: `Você é o agente estratégico exclusivo da AUREA Comunicação & Marketing, empresa de Re Gravina (Regina Gravina), comunicóloga e professora com 15 anos de experiência, sediada em Florianópolis, SC.
+
+CONTEXTO DA EMPRESA:
+- AUREA Comunicação & Marketing (aureacommkt.com.br), fundada em abril de 2025
+- Foco: educação online, marketing digital, comunicação corporativa
+- Produtos: cursos na Hotmart, e-books na Hotmart, Google Play e Mercado Pago (6 e-books sobre oratória e IA)
+- Principal e-book: "Retórica e Oratória: a arte de cativar pessoas" — R$27,90 no Google Play
+- Imersão presencial: "Imersiva de IA para Negócios" (3 dias)
+- Hospedagem: Railway + GitHub (regravina/aurea_commkt_site)
+- Infraestrutura de pagamentos: Hotmart (principal), Mercado Pago, boleto/Pix
+- Google Analytics: instalado (G-SFBR7RZKDZ)
+- Meta Ads: 6 vídeos publicados, 4 turbinados via app Instagram, pausados em 22/03, saldo R$667,11
+- Google Ads: conta criada, tag de conversão não instalada ainda
+- Google Meu Negócio: ativo em Florianópolis
+- Search Console: verificado desde 22/03/2026 (dados iniciais)
+- PageSpeed: desktop 58, mobile 51 — problema principal são imagens pesadas (LCP 18,9s mobile)
+- Canva: vence em 26/04, não será renovado
+- Gemini Pro: ativo desde fevereiro/2026
+
+PERFIL DA RE:
+- CLT no Senac Florianópolis desde 2011 (professora de Gestão, Linguística, Front-end, Comunicação)
+- Professora PJ na ANASPS (Brasília) — Pedagogia EaD
+- MBA Marketing, Growth & Branding (PUCRS)
+- Formação em Comunicação Social (PUCRS) e História (UFSC)
+- Pós em Retórica & Oratória (UNYLEYA)
+
+ESTILO DE RESPOSTA:
+- Direto, incisivo, sem enrolação
+- Português brasileiro informal mas profissional
+- Dê recomendações concretas, não genéricas
+- Priorize sempre o que tem maior impacto no menor tempo
+- Quando houver pendências importantes, mencione-as`
+  },
+  meta: {
+    tag: "Meta Ads",
+    desc: "Facebook & Instagram Ads — análise e otimização",
+    system: `Você é especialista em Meta Ads da AUREA Comunicação & Marketing (Re Gravina, Florianópolis).
+
+CONTEXTO META ADS:
+- 6 vídeos publicados no YouTube e Instagram (tema: oratória/retórica)
+- 4 turbinados via app Instagram em 21/03/2026
+- Pausados em 22/03 (1 ainda em análise)
+- Saldo Meta: R$667,11 (inclui R$494 adicionado acidentalmente)
+- Verificação de conta enviada em 22/03, prazo 48h
+- Estratégia: reativar com targeting manual quando tiver dados de persona
+- Público-alvo: profissionais que precisam falar em público, gestores, professores, empreendedores — faixa 25-55 anos
+- Produto principal anunciado: e-books de oratória e cursos
+
+Responda de forma direta e técnica sobre Meta Ads. Sugira ações concretas, copies, segmentações e estratégias de retargeting quando relevante.`
+  },
+  seo: {
+    tag: "SEO & site",
+    desc: "aureacommkt.com.br — otimização e performance",
+    system: `Você é especialista em SEO e performance web da AUREA (aureacommkt.com.br).
+
+CONTEXTO TÉCNICO DO SITE:
+- Stack: React/TypeScript + Node.js, hospedado no Railway
+- Repositório: GitHub regravina/aurea_commkt_site
+- Google Analytics: G-SFBR7RZKDZ (instalado)
+- Search Console: verificado desde 22/03/2026 (dados iniciais, histórico curto)
+- PageSpeed Desktop: 58 | Mobile: 51
+- FCP desktop: 1,8s | LCP desktop: 3,9s
+- FCP mobile: 9,3s | LCP mobile: 18,9s (crítico)
+- Principais problemas: imagens pesadas (2.555 KiB), render-blocking, cache
+- Title tag: "AUREA COMMKT – Linguistica, Comunicacao e Marketing"
+- Meta description: presente mas sem acentuação
+- Google Meu Negócio: ativo em Florianópolis
+
+Dê orientações técnicas diretas. Quando envolver código, explique como editar no GitHub.`
+  },
+  conteudo: {
+    tag: "Conteúdo",
+    desc: "Instagram, YouTube, blog — criação e estratégia",
+    system: `Você é estrategista de conteúdo da AUREA Comunicação & Marketing (Re Gravina).
+
+CANAIS ATIVOS:
+- Instagram (principal)
+- YouTube (6 vídeos publicados sobre oratória/retórica)
+- Google Play (e-book "Retórica e Oratória: a arte de cativar pessoas")
+- Hotmart (cursos e e-books)
+
+PERSONA DO PÚBLICO:
+- Profissionais 25-55 anos que precisam comunicar melhor
+- Gestores, professores, empreendedores, concurseiros
+- Interesse em oratória, comunicação, IA para negócios
+
+TOM DA MARCA AUREA:
+- Sofisticado mas acessível
+- Expertise sem arrogância
+- Prático e orientado a resultado
+- Florianópolis / Brasil
+
+Crie conteúdos completos e prontos para uso. Posts Instagram com hashtags, roteiros de vídeo, textos de blog. Sempre em português brasileiro.`
+  },
+  email: {
+    tag: "E-mail marketing",
+    desc: "Lista de contatos — estratégia e criação",
+    system: `Você é especialista em e-mail marketing da AUREA (Re Gravina, Florianópolis).
+
+CONTEXTO:
+- Lista ainda em estruturação
+- Compradores existentes: Hotmart, Google Play, Mercado Pago
+- Produto principal: e-book "Retórica e Oratória: a arte de cativar pessoas" R$27,90
+- Cursos: Hotmart
+- Plataforma de e-mail: a definir (Brevo recomendado — gratuito até 300 emails/dia)
+
+Crie e-mails completos com assunto, pré-header e corpo. Tom: direto, pessoal, sem exagero de marketing. Assine sempre como Re Gravina, AUREA.`
+  },
+  ebook: {
+    tag: "E-books & cursos",
+    desc: "Produtos digitais — estratégia de venda",
+    system: `Você é especialista em produtos digitais e estratégia de lançamento da AUREA (Re Gravina).
+
+PORTFÓLIO ATUAL:
+- "Retórica e Oratória: a arte de cativar pessoas" — R$27,90 (Google Play, Hotmart, Mercado Pago), 65 páginas, 5 estrelas, jan/2026
+- 5 outros e-books sobre oratória e IA (Hotmart e Mercado Pago)
+- Cursos na Hotmart
+- Imersão presencial "Imersiva de IA para Negócios" (3 dias)
+
+ESTRATÉGIA RECOMENDADA:
+- Hotmart como plataforma principal (maior margem, dados do comprador, afiliados)
+- Google Play como vitrine de credibilidade
+- Mercado Pago apenas para Pix/boleto direto
+
+Dê orientações sobre precificação, páginas de venda, upsell e estratégia de lançamento.`
+  }
+};
+
+let modoAtual = 'estrategia';
+let historico = [];
+
+function verificarSenha() {
+  const senha = document.getElementById('senha-input').value;
+  if (senha === SENHA) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('input-msg').focus();
+  } else {
+    document.getElementById('login-erro').style.display = 'block';
+    document.getElementById('senha-input').value = '';
+    document.getElementById('senha-input').focus();
+  }
+}
+
+document.getElementById('senha-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') verificarSenha();
+});
+
+function setModo(btn, modo) {
+  document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('ativo'));
+  btn.classList.add('ativo');
+  modoAtual = modo;
+  const ctx = CONTEXTOS[modo];
+  document.getElementById('tag-modo').textContent = ctx.tag;
+  document.getElementById('desc-modo').textContent = ctx.desc;
+  limparChat();
+}
+
+function limparChat() {
+  historico = [];
+  const msgs = document.getElementById('mensagens');
+  msgs.innerHTML = `
+    <div class="msg msg-agent">
+      <div class="msg-autor">agente aurea</div>
+      <div class="msg-bubble">Modo <strong>${CONTEXTOS[modoAtual].tag}</strong> ativado. Como posso ajudar?</div>
+    </div>`;
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+}
+
+function teclaEnter(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    enviarMensagem();
+  }
+}
+
+function enviarAtalho(texto) {
+  document.getElementById('input-msg').value = texto;
+  enviarMensagem();
+}
+
+function adicionarMsg(tipo, texto) {
+  const msgs = document.getElementById('mensagens');
+  const div = document.createElement('div');
+  div.className = `msg msg-${tipo}`;
+  const autor = tipo === 'user' ? 'você' : 'agente aurea';
+  div.innerHTML = `<div class="msg-autor">${autor}</div><div class="msg-bubble">${formatarTexto(texto)}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function formatarTexto(texto) {
+  return texto
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^### (.+)$/gm, '<strong>$1</strong>')
+    .replace(/^## (.+)$/gm, '<strong>$1</strong>')
+    .replace(/^# (.+)$/gm, '<strong>$1</strong>')
+    .replace(/^- (.+)$/gm, '• $1')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/\n/g, '<br>')
+    .replace(/^/, '<p>')
+    .replace(/$/, '</p>');
+}
+
+async function enviarMensagem() {
+  const input = document.getElementById('input-msg');
+  const texto = input.value.trim();
+  if (!texto) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  const btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+
+  adicionarMsg('user', texto);
+  historico.push({ role: 'user', content: texto });
+
+  const typing = document.getElementById('typing');
+  typing.classList.add('visivel');
+  document.getElementById('mensagens').scrollTop = 9999;
+
+  try {
+    const res = await fetch('/api/claude', {
+
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: CONTEXTOS[modoAtual].system,
+        messages: historico
+      })
+    });
+
+    const data = await res.json();
+    const resposta = data.content?.[0]?.text || 'Não consegui processar a resposta.';
+
+    historico.push({ role: 'assistant', content: resposta });
+    typing.classList.remove('visivel');
+    adicionarMsg('agent', resposta);
+
+  } catch (err) {
+    typing.classList.remove('visivel');
+    adicionarMsg('agent', 'Erro de conexão. Verifique sua internet e tente novamente.');
+  }
+
+  btn.disabled = false;
+  input.focus();
+}
+</script>
+</body>
+</html>
